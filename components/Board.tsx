@@ -29,7 +29,7 @@ export default function Board({ squares, onSquareClick, currentPlayer }: BoardPr
   } else if (isGameDraw) {
     status = (
       <div className="text-center p-4 bg-yellow-100 rounded-lg border-2 border-yellow-300">
-        <span className="text-yellow-800 font-bold text-2xl">🤝 It's a Draw!</span>
+        <span className="text-yellow-800 font-bold text-2xl">🤝 It&apos;s a Draw!</span>
       </div>
     );
   } else {
