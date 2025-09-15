@@ -1,95 +1,121 @@
 'use client';
 
 import { useState } from 'react';
-import { calculateWinner, isDraw, getNextPlayer, getGameStats } from '../utils/gameLogic';
+import Board from '../components/Board';
+import { getNextPlayer } from '../utils/gameLogic';
 import type { GameBoard } from '../types/game';
 
 export default function Home() {
-  // Test different game scenarios
+  const [squares, setSquares] = useState<GameBoard>(Array(9).fill(null));
+  const [moveCount, setMoveCount] = useState(0);
+  
+  const currentPlayer = getNextPlayer(moveCount);
+  
+  const handleSquareClick = (index: number) => {
+    // Create new squares array with the move
+    const newSquares = [...squares];
+    newSquares[index] = currentPlayer;
+    setSquares(newSquares);
+    setMoveCount(moveCount + 1);
+  };
+  
+  const resetGame = () => {
+    setSquares(Array(9).fill(null));
+    setMoveCount(0);
+  };
+
+  const loadTestScenario = (scenario: GameBoard) => {
+    setSquares(scenario);
+    setMoveCount(scenario.filter(s => s !== null).length);
+  };
+
+  // Preset game scenarios for testing
   const testScenarios = [
     {
-      name: "X Wins - Top Row",
-      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null] as GameBoard
+      name: "Empty Board",
+      board: Array(9).fill(null) as GameBoard
     },
     {
-      name: "O Wins - Diagonal", 
-      board: ['O', 'X', 'X', 'X', 'O', null, null, null, 'O'] as GameBoard
+      name: "Almost Win - X",
+      board: ['X', 'X', null, 'O', 'O', null, null, null, null] as GameBoard
     },
     {
-      name: "Draw Game",
-      board: ['X', 'O', 'X', 'O', 'O', 'X', 'O', 'X', 'O'] as GameBoard
+      name: "Almost Win - O",
+      board: ['O', null, 'X', null, 'O', 'X', null, null, null] as GameBoard
     },
     {
-      name: "Game in Progress",
-      board: ['X', 'O', null, 'O', 'X', null, null, null, null] as GameBoard
+      name: "Almost Draw",
+      board: ['X', 'O', 'X', 'O', 'X', null, 'O', 'X', 'O'] as GameBoard
     }
   ];
 
-  const [currentScenario, setCurrentScenario] = useState(0);
-  const currentBoard = testScenarios[currentScenario].board;
-  const moveCount = currentBoard.filter(square => square !== null).length;
-  
-  const winner = calculateWinner(currentBoard);
-  const isGameDraw = isDraw(currentBoard);
-  const nextPlayer = getNextPlayer(moveCount);
-  const stats = getGameStats(currentBoard, moveCount);
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-          🧠 Testing Game Logic
-        </h1>
+        <header className="text-center mb-8">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            🎲 Testing Board Component
+          </h1>
+          <p className="text-xl text-gray-600">Play a game or load test scenarios</p>
+        </header>
         
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Test Scenarios */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Test Scenarios</h2>
-            
-            <div className="space-y-3">
-              {testScenarios.map((scenario, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentScenario(index)}
-                  className={`w-full p-3 rounded-lg text-left transition-all ${
-                    currentScenario === index
-                      ? 'bg-blue-500 text-white shadow-md'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  {scenario.name}
-                </button>
-              ))}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Game Board */}
+          <div className="lg:col-span-2 flex justify-center">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <Board
+                squares={squares}
+                onSquareClick={handleSquareClick}
+                currentPlayer={currentPlayer}
+              />
             </div>
           </div>
-
-          {/* Results */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Results</h2>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-1 p-2 bg-gray-200 rounded-lg">
-                {currentBoard.map((square, index) => (
-                  <div
+          
+          {/* Controls & Info */}
+          <div className="space-y-6">
+            {/* Game Controls */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Game Controls</h2>
+              
+              <button
+                onClick={resetGame}
+                className="w-full mb-4 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+              >
+                🔄 Reset Game
+              </button>
+              
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Load Test Scenarios:</p>
+                {testScenarios.map((scenario, index) => (
+                  <button
                     key={index}
-                    className={`w-12 h-12 flex items-center justify-center bg-white rounded text-lg font-bold ${
-                      winner?.line.includes(index) ? 'bg-green-200' : ''
-                    } ${
-                      square === 'X' ? 'text-blue-600' : 'text-red-600'
-                    }`}
+                    onClick={() => loadTestScenario(scenario.board)}
+                    className="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm transition-colors"
                   >
-                    {square || '·'}
-                  </div>
+                    {scenario.name}
+                  </button>
                 ))}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <p><strong>Winner:</strong> {winner ? winner.winner : 'None'}</p>
-                <p><strong>Winning Line:</strong> {winner ? `[${winner.line.join(', ')}]` : 'None'}</p>
-                <p><strong>Is Draw:</strong> {isGameDraw ? 'Yes' : 'No'}</p>
-                <p><strong>Next Player:</strong> {nextPlayer}</p>
-                <p><strong>Total Moves:</strong> {stats.totalMoves}</p>
-                <p><strong>Game Over:</strong> {stats.isGameOver ? 'Yes' : 'No'}</p>
+            {/* Game Stats */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Game Stats</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Current Player:</span>
+                  <span className={`font-bold ${currentPlayer === 'X' ? 'text-blue-600' : 'text-red-600'}`}>
+                    {currentPlayer}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Moves Made:</span>
+                  <span className="font-bold text-green-600">{moveCount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Empty Squares:</span>
+                  <span className="font-bold text-purple-600">{9 - moveCount}</span>
+                </div>
               </div>
             </div>
           </div>
