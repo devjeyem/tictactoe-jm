@@ -19,7 +19,6 @@ export default function Game() {
       ...gameState.history.slice(0, gameState.currentMove + 1),
       newSquares
     ];
-    
     setGameState({
       history: nextHistory,
       currentMove: nextHistory.length - 1
@@ -46,15 +45,15 @@ export default function Game() {
   const moves = gameState.history.map((_, move) => {
     const description = move === 0 ? 'Game start' : `Move #${move}`;
     const isCurrentMove = move === gameState.currentMove;
-    
+
     return (
-      <li key={move} className="mb-2">
+      <li key={move}>
         <button
           onClick={() => jumpToMove(move)}
-          className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                     ${isCurrentMove 
-                       ? 'bg-blue-500 text-white shadow-md ring-2 ring-blue-300' 
-                       : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:shadow-sm'}`}
+          className={`w-full px-3 py-2 rounded-md text-sm font-medium transition-all duration-200
+                     ${isCurrentMove
+              ? 'bg-blue-600 text-white shadow ring-2 ring-blue-300'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
         >
           {description}
         </button>
@@ -63,55 +62,59 @@ export default function Game() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <header className="text-center mb-12">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            🎮 Tic-Tac-Toe
+    <div className="min-h-screen bg-gradient-to-br from-indigo-300 via-white to-cyan-300 p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <header className="text-center mb-10">
+          <h1 className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2 drop-shadow-sm">
+            Tic-Tac-Toe
           </h1>
-          <p className="text-xl text-gray-600">Master the classic game with time travel!</p>
+          <p className="text-lg text-gray-600">Classic fun with a modern twist!</p>
         </header>
-        
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 flex justify-center">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <Board
-                squares={currentSquares}
-                onSquareClick={handleSquareClick}
-                currentPlayer={currentPlayer}
-              />
+
+        {/* Main Section */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-8">
+          {/* Game Board */}
+          <div className="flex justify-center">
+            <Board
+              squares={currentSquares}
+              onSquareClick={handleSquareClick}
+              currentPlayer={currentPlayer}
+            />
+          </div>
+
+          {/* Stats */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-5 shadow-inner">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Game Stats</h3>
+            <div className="grid grid-cols-3 text-center gap-4">
+              <div>
+                <p className="text-gray-600">Current Move</p>
+                <p className="font-bold text-blue-600">{gameState.currentMove}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Total Moves</p>
+                <p className="font-bold text-green-600">{gameState.history.length - 1}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Next Player</p>
+                <p className="font-bold text-purple-600">{currentPlayer}</p>
+              </div>
             </div>
           </div>
-          
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">History</h2>
-                <button
-                  onClick={resetGame}
-                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
-                >
-                  Reset
-                </button>
-              </div>
-              
-              <div className="max-h-60 overflow-y-auto">
-                <ol className="space-y-1">{moves}</ol>
-              </div>
-            </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">Stats</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Current Move:</span>
-                  <span className="font-bold text-blue-600">{gameState.currentMove}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Total Moves:</span>
-                  <span className="font-bold text-green-600">{gameState.history.length - 1}</span>
-                </div>
-              </div>
+          {/* History */}
+          <div className="bg-gray-50 rounded-xl p-5 shadow">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-semibold text-gray-800">Move History</h2>
+              <button
+                onClick={resetGame}
+                className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm shadow"
+              >
+                Reset
+              </button>
+            </div>
+            <div className="max-h-60 overflow-y-auto">
+              <ol className="space-y-2">{moves}</ol>
             </div>
           </div>
         </div>
